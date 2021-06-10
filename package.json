@@ -1,0 +1,44 @@
+{
+  "name": "Cinema-amministratore",
+  "version": "1.0.0",
+  "description": "",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "watch": "webpack --config webpack.common.js --watch",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/RobertoCornacchiari/Cinema-amministratore.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/RobertoCornacchiari/Cinema-amministratore/issues"
+  },
+  "homepage": "https://github.com/RobertoCornacchiari/Cinema-amministratore#readme",
+  "dependencies": {
+    "bootstrap": "^5.0.1",
+    "electron": "^13.1.2",
+    "react": "^17.0.2",
+    "react-alert": "^7.0.3",
+    "react-alert-template-basic": "^1.0.2",
+    "react-bootstrap": "^1.6.1",
+    "react-dom": "^17.0.2"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.14.5",
+    "@babel/preset-env": "^7.14.5",
+    "@babel/preset-react": "^7.14.5",
+    "babel-loader": "^8.2.2",
+    "css-loader": "^5.2.6",
+    "electron-reload": "^1.5.0",
+    "sass": "^1.34.1",
+    "sass-loader": "^12.0.0",
+    "style-loader": "^2.0.0",
+    "webpack": "^5.38.1",
+    "webpack-cli": "^4.7.2"
+  }
+}
