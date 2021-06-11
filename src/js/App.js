@@ -1,7 +1,7 @@
 import React, { useReducer, useContext, useEffect, useState } from "react";
 import ReactDOM from "react-dom";
-import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
-import {Home, AggiungiFilm} from './components.js';
+import { HashRouter as Router, Switch, Route, Link } from "react-router-dom";
+import {Home, GestioneFilm} from './components.js';
 import "./style.scss";
 
 const { GETData, postData } = require("./fetch.js");
@@ -10,16 +10,15 @@ const AppContext = React.createContext(null);
 
 export function App() {
   const [state, dispatch] = useReducer(reducer, {
-    codice: "",
-    proiezioniDisponibili: [],
+    film: new Array(),
   });
 
   return (
     <AppContext.Provider value={{ state, dispatch }}>
         <Router>
             <Switch>
-                <Route exact path="/aggiungiFilm">
-                    <AggiungiFilm contesto={AppContext} />
+                <Route exact path="/gestioneFilm">
+                    <GestioneFilm contesto={AppContext} />
                 </Route>
                 <Route path="/">
                     <Home contesto={AppContext} />
@@ -33,8 +32,8 @@ export function App() {
 function reducer(state, action) {
     let newState = { ...state };
     switch (action.type) {
-      case "Carica proiezioni":
-        newState.proiezioniDisponibili = action.payload;
+      case "Carica film":
+        newState.film = action.payload;
       break;
       default:
         break;

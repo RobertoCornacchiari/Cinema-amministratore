@@ -1,4 +1,4 @@
-const {app, BrowserWindow, ipcMain} = require("electron");
+const {app, BrowserWindow, ipcMain, Notification} = require("electron");
 const path = require('path');
 
 const isDev = !app.isPackaged;
@@ -9,7 +9,7 @@ function createWindow (){
         height: 800,
         backgroundColor: "white",
         webPreferences: {
-            nodeIntegration: false,
+            nodeIntegration: true,
             worldSafeExecuteJavaScript: true,
             contextIsolation: true,
             preload: path.join(__dirname, 'preload.js')
