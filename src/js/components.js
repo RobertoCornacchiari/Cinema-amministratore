@@ -141,7 +141,7 @@ export function GestioneFilm(params) {
               <form>
                 <div className="mb-3">
                   <label htmlFor="ScegliFilm" className="form-label">
-                    Proiezioni Odierne
+                    Proiezioni
                   </label>
                   <select
                     className="form-select"
@@ -181,6 +181,131 @@ export function GestioneFilm(params) {
       }
     />
   );
+}
+
+let boolProiezioni = 0;
+
+export function GestioneProiezioni(params){
+  const { state, dispatch } = useContext(params.contesto);
+
+  function carica() {
+    if (boolProiezioni == 0) {
+      boolProiezioni = 1;
+      GETData("proiezioni.php", {}).then((r) => {
+        let a = new Array();
+        for (let i in r) a.push(r[i]);
+        let elencoProiezioni = a;
+        console.log(elencoProiezioni);
+        dispatch({ type: "Carica proiezioni", payload: elencoProiezioni });
+      });
+    }
+  }
+  carica();
+
+  return (
+    <Pagina
+      body={
+        <>
+          <Card
+            nome="Aggiungi Proiezione"
+            titolo="Aggiungi Proiezione"
+            contesto={params.contesto}
+            bodyCard={
+              <form>
+                <button
+                  type="button"
+                  className="btn btn-primary"
+                  id="Conferma"
+                  style={{ fontSize: "20px" }}
+                  onClick={() => {
+                    console.log("Entrato");
+                    let titolo =
+                      document.getElementById("AggiungiFilmTitolo").value;
+                    let durata =
+                      document.getElementById("AggiungiFilmDurata").value;
+                    let regista = document.getElementById(
+                      "AggiungiFilmRegista"
+                    ).value;
+                    if (
+                      titolo == "" ||
+                      isNaN(durata) ||
+                      regista == "" ||
+                      durata == ""
+                    ) {
+                      console.log("Fail");
+                      electron.notificationApi.sendNotification(
+                        "Campi non correttamente riempiti."
+                      );
+                    } else {
+                      postData("aggiungiFilm.php", {
+                        titolo: titolo,
+                        durata: durata,
+                        regista: regista,
+                      }).then((r) => {
+                        document.getElementById("AggiungiFilmTitolo").value =
+                          "";
+                        document.getElementById("AggiungiFilmDurata").value =
+                          "";
+                        document.getElementById("AggiungiFilmRegista").value =
+                          "";
+                        bool = 0;
+                        carica();
+                      });
+                    }
+                  }}
+                >
+                  Aggiungi
+                </button>
+              </form>
+            }
+          />
+          <Card
+            nome="Rimuovi Proiezione"
+            titolo="Rimuovi Proiezione"
+            contesto={params.contesto}
+            bodyCard={
+              <form>
+                <div className="mb-3">
+                  <label htmlFor="ScegliProiezione" className="form-label">
+                    Proiezioni
+                  </label>
+                  <select
+                    className="form-select"
+                    id="ScegliProiezione"
+                    aria-describedby="ScegliProiezioneHelp"
+                    required
+                  >
+                    <Proiezioni contesto={params.contesto} />
+                  </select>
+                  <div id="ScegliProiezioneHelp" className="form-text">
+                    Seleziona la proiezione da eliminare.
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  className="btn btn-danger"
+                  id="Conferma"
+                  style={{ fontSize: "20px" }}
+                  onClick={() => {
+                    let proiezione = document.getElementById("ScegliProiezione").value;
+                    if (proiezione != null) {
+                      postData("EliminaProiezione.php", {
+                        proiezione: proiezione,
+                      }).then((r) => {
+                        boolProiezioni = 0;
+                        carica();
+                      });
+                    }
+                  }}
+                >
+                  Elimina
+                </button>
+              </form>
+            }
+          />
+        </>
+      }/>
+  )
 }
 
 function Pagina(props) {
@@ -250,4 +375,23 @@ function Film(params) {
     );
   });
   return <>{film}</>;
+}
+
+function Proiezioni(params) {
+  const { state, dispatch } = useContext(params.contesto);
+  let proiezioni = [];
+
+  let disponibili = state.proiezioni;
+  console.log(disponibili);
+  disponibili.forEach((element, i) => {
+    let stringa =
+      element.titolo + " " + element.dataOra + " Sala: " + element.idSala;
+    proiezioni[proiezioni.length] = (
+      <option value={element.id} key={i}>
+        {stringa}
+      </option>
+    );
+  });
+
+  return <>{proiezioni}</>;
 }
