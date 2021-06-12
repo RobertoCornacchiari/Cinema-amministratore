@@ -12,6 +12,7 @@ export function App() {
   const [state, dispatch] = useReducer(reducer, {
     film: new Array(),
     proiezioni: new Array(),
+    sale: new Array(),
   });
 
   return (
@@ -41,6 +42,9 @@ function reducer(state, action) {
       break;
       case "Carica proiezioni":
         newState.proiezioni = action.payload;
+      break;
+      case "Carica sale":
+        newState.sale = action.payload;
       break;
       default:
         break;

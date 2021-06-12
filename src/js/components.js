@@ -198,6 +198,20 @@ export function GestioneProiezioni(params){
         console.log(elencoProiezioni);
         dispatch({ type: "Carica proiezioni", payload: elencoProiezioni });
       });
+      GETData("film.php", {}).then((r) => {
+        let a = new Array();
+        for (let i in r) a.push(r[i]);
+        let elencoFilm = a;
+        console.log(elencoFilm);
+        dispatch({ type: "Carica film", payload: elencoFilm });
+      });
+      GETData("sale.php", {}).then((r) => {
+        let a = new Array();
+        for (let i in r) a.push(r[i]);
+        let elencoSale = a;
+        console.log(elencoSale);
+        dispatch({ type: "Carica sale", payload: elencoSale });
+      });
     }
   }
   carica();
@@ -212,44 +226,74 @@ export function GestioneProiezioni(params){
             contesto={params.contesto}
             bodyCard={
               <form>
+                <div className="mb-3">
+                  <label htmlFor="ScegliFilm" className="form-label">
+                    Film
+                  </label>
+                  <select
+                    className="form-select"
+                    id="ScegliFilm"
+                    aria-describedby="ScegliFilmHelp"
+                    required
+                  >
+                    <Film contesto={params.contesto} />
+                  </select>
+                </div>
+                <div className="mb-3">
+                  <label htmlFor="ScegliSala" className="form-label">
+                    Sala
+                  </label>
+                  <select
+                    className="form-select"
+                    id="ScegliSala"
+                    aria-describedby="ScegliSalaHelp"
+                    required
+                  >
+                    <Sale contesto={params.contesto} />
+                  </select>
+                </div>
+                <div className="mb-3">
+                  <label htmlFor="ScegliData" className="form-label">
+                    Data
+                  </label><br/>
+                  <input type="datetime-local" id="ScegliData"></input>
+                </div>
                 <button
                   type="button"
                   className="btn btn-primary"
-                  id="Conferma"
+                  id="Aggiungi"
                   style={{ fontSize: "20px" }}
                   onClick={() => {
-                    console.log("Entrato");
-                    let titolo =
-                      document.getElementById("AggiungiFilmTitolo").value;
-                    let durata =
-                      document.getElementById("AggiungiFilmDurata").value;
-                    let regista = document.getElementById(
-                      "AggiungiFilmRegista"
+                    let film =
+                      document.getElementById("ScegliFilm").value;
+                    let sala =
+                      document.getElementById("ScegliSala").value;
+                    let data = document.getElementById(
+                      "ScegliData"
                     ).value;
                     if (
-                      titolo == "" ||
-                      isNaN(durata) ||
-                      regista == "" ||
-                      durata == ""
+                      film == "" ||
+                      sala == "" ||
+                      data == ""
                     ) {
                       console.log("Fail");
                       electron.notificationApi.sendNotification(
                         "Campi non correttamente riempiti."
                       );
                     } else {
-                      postData("aggiungiFilm.php", {
-                        titolo: titolo,
-                        durata: durata,
-                        regista: regista,
+                      postData("aggiungiProiezione.php", {
+                        film: film,
+                        sala: sala,
+                        data: data,
                       }).then((r) => {
-                        document.getElementById("AggiungiFilmTitolo").value =
-                          "";
-                        document.getElementById("AggiungiFilmDurata").value =
-                          "";
-                        document.getElementById("AggiungiFilmRegista").value =
-                          "";
-                        bool = 0;
-                        carica();
+                        if (r == "Errore"){
+                          electron.notificationApi.sendNotification(
+                            "La proiezione non può essere registrate in quanto la sala richiesta risulta già occupata per la data e l'ora desiderate."
+                          );
+                        } else {
+                          boolProiezioni = 0;
+                          carica();
+                        }
                       });
                     }
                   }}
@@ -392,6 +436,21 @@ function Proiezioni(params) {
       </option>
     );
   });
-
   return <>{proiezioni}</>;
+}
+
+function Sale(params) {
+  const { state, dispatch } = useContext(params.contesto);
+  let sale = [];
+
+  let disponibili = state.sale;
+  disponibili.forEach((element, i) => {
+    let stringa = "Sala " + element.id + "; posti disponibili: " + element.postiDisponibili;
+    sale[sale.length] = (
+      <option value={element.id} key={i}>
+        {stringa}
+      </option>
+    );
+  });
+  return <>{sale}</>;
 }
