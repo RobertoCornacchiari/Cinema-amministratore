@@ -1,30 +1,11 @@
 import React, { useReducer, useContext, useEffect, useState } from "react";
 import "./style.scss";
 import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
+import { Table } from "react-bootstrap";
 
 const { GETData, postData } = require("./fetch.js");
 
 let bool = 0;
-
-export function Home(params) {
-  const { state, dispatch } = useContext(params.contesto);
-
-  function carica() {
-    if (bool == 0) {
-      bool = 1;
-      GETData("film.php", {}).then((r) => {
-        let a = new Array();
-        for (let i in r) a.push(r[i]);
-        let elencoFilm = a;
-        console.log(elencoFilm);
-        dispatch({ type: "Carica film", payload: elencoFilm });
-      });
-    }
-  }
-  carica();
-
-  return <Pagina body={<h1>Ciao</h1>} />;
-}
 
 export function GestioneFilm(params) {
   const { state, dispatch } = useContext(params.contesto);
@@ -185,7 +166,7 @@ export function GestioneFilm(params) {
 
 let boolProiezioni = 0;
 
-export function GestioneProiezioni(params){
+export function GestioneProiezioni(params) {
   const { state, dispatch } = useContext(params.contesto);
 
   function carica() {
@@ -255,7 +236,8 @@ export function GestioneProiezioni(params){
                 <div className="mb-3">
                   <label htmlFor="ScegliData" className="form-label">
                     Data
-                  </label><br/>
+                  </label>
+                  <br />
                   <input type="datetime-local" id="ScegliData"></input>
                 </div>
                 <button
@@ -264,18 +246,10 @@ export function GestioneProiezioni(params){
                   id="Aggiungi"
                   style={{ fontSize: "20px" }}
                   onClick={() => {
-                    let film =
-                      document.getElementById("ScegliFilm").value;
-                    let sala =
-                      document.getElementById("ScegliSala").value;
-                    let data = document.getElementById(
-                      "ScegliData"
-                    ).value;
-                    if (
-                      film == "" ||
-                      sala == "" ||
-                      data == ""
-                    ) {
+                    let film = document.getElementById("ScegliFilm").value;
+                    let sala = document.getElementById("ScegliSala").value;
+                    let data = document.getElementById("ScegliData").value;
+                    if (film == "" || sala == "" || data == "") {
                       console.log("Fail");
                       electron.notificationApi.sendNotification(
                         "Campi non correttamente riempiti."
@@ -286,7 +260,7 @@ export function GestioneProiezioni(params){
                         sala: sala,
                         data: data,
                       }).then((r) => {
-                        if (r == "Errore"){
+                        if (r == "Errore") {
                           electron.notificationApi.sendNotification(
                             "La proiezione non può essere registrate in quanto la sala richiesta risulta già occupata per la data e l'ora desiderate."
                           );
@@ -331,7 +305,8 @@ export function GestioneProiezioni(params){
                   id="Conferma"
                   style={{ fontSize: "20px" }}
                   onClick={() => {
-                    let proiezione = document.getElementById("ScegliProiezione").value;
+                    let proiezione =
+                      document.getElementById("ScegliProiezione").value;
                     if (proiezione != null) {
                       postData("EliminaProiezione.php", {
                         proiezione: proiezione,
@@ -348,8 +323,9 @@ export function GestioneProiezioni(params){
             }
           />
         </>
-      }/>
-  )
+      }
+    />
+  );
 }
 
 function Pagina(props) {
@@ -358,13 +334,6 @@ function Pagina(props) {
       <nav className="barra navbar navbar-expand-md navbar-dark bg-dark">
         <div className="collapse navbar-collapse" id="navbarNavDropdown">
           <ul className="navbar-nav">
-            <li className="nav-item active">
-              <Link to="/" style={{ textDecoration: "none" }}>
-                <a className="nav-link" href="#">
-                  Home
-                </a>
-              </Link>
-            </li>
             <li className="nav-item">
               <Link to="/gestioneFilm" style={{ textDecoration: "none" }}>
                 <a className="nav-link" href="#">
@@ -394,11 +363,125 @@ function Pagina(props) {
   );
 }
 
+export function CercaSpettatori(params) {
+  const { state, dispatch } = useContext(params.contesto);
+
+  return (
+    <Pagina
+      body={
+        <CardSingola
+          nome="Rimuovi Proiezione"
+          titolo="Rimuovi Proiezione"
+          contesto={params.contesto}
+          bodyCard={
+            <>
+              <form>
+                <div className="mb-3">
+                  <label htmlFor="Recapito" className="form-label">
+                    Recapito telefonico
+                  </label>
+                  <input
+                    type="text"
+                    className="form-control"
+                    id="Recapito"
+                    required
+                  ></input>
+                </div>
+                <div id="RecapitoHelp" className="form-text">
+                  Inserisci il recapito telefonico dello spettatore risultato positivo.
+                </div>
+                <button
+                  type="button"
+                  className="btn btn-primary"
+                  id="Conferma"
+                  style={{ fontSize: "20px" }}
+                  onClick={() => {
+                    let recapito =
+                      document.getElementById("Recapito").value;
+                    if (isNaN(recapito)) {
+                      electron.notificationApi.sendNotification(
+                        "Il recapito inserito non è corretto."
+                      );
+                      dispatch({ type: "Carica recapiti", payload: new Array() });
+                    } else {
+                      GETData("cercaRecapito.php", {
+                        recapito: recapito,
+                      }).then((r) => {
+                        if (r == "Errore") {
+                          electron.notificationApi.sendNotification(
+                            "Il recapito inserito non è corretto o non risulta presente in nessuna proiezione."
+                          );
+                          dispatch({ type: "Carica recapiti", payload: new Array() });
+                        } else {
+                          dispatch({ type: "Carica recapiti", payload: r });
+                        }
+                      });
+                    }
+                  }}
+                >
+                  Cerca
+                </button>
+              </form>
+              <br />
+              <SpettatoriPresenti contesto={params.contesto} />
+            </>
+          }
+        />
+      }
+    />
+  );
+}
+
+export function SpettatoriPresenti(params) {
+  const { state, dispatch } = useContext(params.contesto);
+  let array = state.recapiti;
+  let recapiti = [];
+  array.forEach((element, i) => {
+    let j = i + 1;
+    recapiti[recapiti.length] = (
+      <tr key={i}>
+        <td>{j}</td>
+        <td>{element.numeroDiTelefono}</td>
+        <td>{element.titolo}</td>
+        <td>{element.dataOra}</td>
+      </tr>
+    );
+  });
+  if (recapiti.length == 0)
+    return (<></>)
+  else
+    return (
+      <Table striped bordered hover size="sm" style={{ marginTop: "10" }}>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Recapito</th>
+            <th>Film</th>
+            <th>Data</th>
+          </tr>
+        </thead>
+        <tbody>{recapiti}</tbody>
+      </Table>
+    );
+}
+
+
 export function Card(params) {
   const { state, dispatch } = useContext(params.contesto);
 
   return (
     <div className="card">
+      <h5 className="card-header">{params.titolo}</h5>
+      <div className="card-body">{params.bodyCard}</div>
+    </div>
+  );
+}
+
+export function CardSingola(params) {
+  const { state, dispatch } = useContext(params.contesto);
+
+  return (
+    <div className="cardSingola">
       <h5 className="card-header">{params.titolo}</h5>
       <div className="card-body">{params.bodyCard}</div>
     </div>
@@ -445,7 +528,8 @@ function Sale(params) {
 
   let disponibili = state.sale;
   disponibili.forEach((element, i) => {
-    let stringa = "Sala " + element.id + "; posti disponibili: " + element.postiDisponibili;
+    let stringa =
+      "Sala " + element.id + "; posti disponibili: " + element.postiDisponibili;
     sale[sale.length] = (
       <option value={element.id} key={i}>
         {stringa}

@@ -15,10 +15,14 @@ body {
   text-align: center;
   display: flex;
   }
-.card {
+.card, .cardSingola {
   background-color: white;
-width: 700px;
-height: fit-content;
-margin: 10px 20px;
-font-size: 20px;
+  width: 700px;
+  height: fit-content;
+  margin: 10px 20px;
+  font-size: 20px;
+}
+.cardSingola {
+  margin: 10px auto;
+  border-radius: 4px;
 }

@@ -1,7 +1,7 @@
 import React, { useReducer, useContext, useEffect, useState } from "react";
 import ReactDOM from "react-dom";
 import { HashRouter as Router, Switch, Route, Link } from "react-router-dom";
-import {Home, GestioneFilm, GestioneProiezioni} from './components.js';
+import {GestioneFilm, GestioneProiezioni, CercaSpettatori} from './components.js';
 import "./style.scss";
 
 const { GETData, postData } = require("./fetch.js");
@@ -13,20 +13,21 @@ export function App() {
     film: new Array(),
     proiezioni: new Array(),
     sale: new Array(),
+    recapiti: new Array(),
   });
 
   return (
     <AppContext.Provider value={{ state, dispatch }}>
         <Router>
             <Switch>
-                <Route exact path="/gestioneFilm">
-                    <GestioneFilm contesto={AppContext} />
-                </Route>
                 <Route exact path="/gestioneProiezioni">
                     <GestioneProiezioni contesto={AppContext} />
                 </Route>
+                <Route exact path="/cercaSpettatori">
+                    <CercaSpettatori contesto={AppContext} />
+                </Route>
                 <Route path="/">
-                    <Home contesto={AppContext} />
+                    <GestioneFilm contesto={AppContext} />
                 </Route>
             </Switch>
         </Router>
@@ -45,6 +46,9 @@ function reducer(state, action) {
       break;
       case "Carica sale":
         newState.sale = action.payload;
+      break;
+      case "Carica recapiti":
+        newState.recapiti = action.payload;
       break;
       default:
         break;
