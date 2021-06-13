@@ -122,7 +122,7 @@ export function GestioneFilm(params) {
               <form>
                 <div className="mb-3">
                   <label htmlFor="ScegliFilm" className="form-label">
-                    Proiezioni
+                    Film
                   </label>
                   <select
                     className="form-select"
@@ -370,8 +370,8 @@ export function CercaSpettatori(params) {
     <Pagina
       body={
         <CardSingola
-          nome="Rimuovi Proiezione"
-          titolo="Rimuovi Proiezione"
+          nome="Cerca Spettatore"
+          titolo="Cerca Spettatore"
           contesto={params.contesto}
           bodyCard={
             <>
